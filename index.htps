@@ -1,0 +1,1556 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Wallet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        body {
+            background: #f5f5f7;
+            color: #1c1c1e;
+            max-width: 430px;
+            margin: 0 auto;
+            padding-bottom: 70px;
+            position: relative;
+        }
+
+        /* Общие стили */
+        .header {
+            padding: 15px;
+            text-align: center;
+            position: relative;
+            font-size: 17px;
+            font-weight: 600;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .close-btn {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            font-size: 20px;
+            color: #1c1c1e;
+            text-decoration: none;
+        }
+        .card {
+            background: white;
+            margin: 15px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .action-button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            border: none;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .primary-button {
+            background: #0088cc;
+            color: white;
+        }
+        .secondary-button {
+            background: #f5f5f7;
+            color: #1c1c1e;
+        }
+
+        /* Главная страница */
+        #main-page {
+            display: block;
+        }
+        .balance-card {
+            text-align: center;
+        }
+        .balance-title {
+            font-size: 14px;
+            color: #8e8e93;
+            margin-bottom: 5px;
+        }
+        .balance-amount {
+            font-size: 28px;
+            font-weight: 600;
+        }
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            margin: 15px;
+            gap: 10px;
+        }
+        .action-btn {
+            flex: 1 1 calc(33.333% - 7px);
+            min-width: 100px;
+            background: white;
+            border: none;
+            padding: 12px 8px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .action-btn i {
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+        .crypto-list {
+            margin: 15px;
+        }
+        .crypto-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .crypto-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: #f5f5f7;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+        }
+        .crypto-info {
+            flex: 1;
+        }
+        .crypto-name {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        .crypto-amount {
+            font-size: 14px;
+            color: #8e8e93;
+        }
+        .crypto-price {
+            text-align: right;
+        }
+        .price-amount {
+            font-weight: 500;
+        }
+        .price-change {
+            font-size: 14px;
+        }
+        .positive {
+            color: #34c759;
+        }
+        .negative {
+            color: #ff3b30;
+        }
+        .add-coin {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            margin: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: #0088cc;
+            font-weight: 500;
+        }
+        .add-coin i {
+            margin-right: 8px;
+        }
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            max-width: 430px;
+            display: flex;
+            background: white;
+            padding: 12px 0;
+            box-shadow: 0 -1px 3px rgba(0,0,0,0.1);
+            border-top: 1px solid #e5e5ea;
+        }
+        .footer-btn {
+            flex: 1;
+            text-align: center;
+            font-size: 12px;
+            color: #8e8e93;
+            font-weight: 500;
+            padding: 5px;
+        }
+        .footer-btn i {
+            display: block;
+            margin-bottom: 3px;
+            font-size: 18px;
+        }
+        .footer-btn.active {
+            color: #0088cc;
+            font-weight: 600;
+        }
+
+        /* Страницы (скрыты по умолчанию) */
+        .page {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        /* Страница выбора монеты для пополнения */
+        .deposit-select-page .crypto-item {
+            padding: 12px 15px;
+        }
+
+        /* Страница пополнения */
+        .deposit-warning {
+            background: #fff8e6;
+            margin: 15px;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 14px;
+            color: #ff9500;
+            text-align: center;
+            border-left: 4px solid #ff9500;
+        }
+        .deposit-address-value {
+            font-size: 16px;
+            word-break: break-all;
+            padding: 12px;
+            background: #f5f5f7;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .deposit-min-amount {
+            font-size: 14px;
+            color: #8e8e93;
+            margin-bottom: 20px;
+        }
+        .network-info {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #8e8e93;
+        }
+
+        /* Страница истории */
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 12px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f5f5f7;
+        }
+        .history-icon i {
+            font-size: 20px;
+        }
+        .history-info {
+            flex: 1;
+        }
+        .history-type {
+            font-weight: 500;
+            margin-bottom: 3px;
+        }
+        .history-date {
+            font-size: 14px;
+            color: #8e8e93;
+        }
+        .history-amount {
+            text-align: right;
+            font-weight: 500;
+        }
+
+        /* Страница обмена */
+        .exchange-section {
+            margin-bottom: 20px;
+        }
+        .exchange-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .exchange-title {
+            font-weight: 500;
+            font-size: 16px;
+            color: #8e8e93;
+        }
+        .exchange-input {
+            width: 100%;
+            border: none;
+            font-size: 28px;
+            font-weight: 600;
+            outline: none;
+            padding: 5px 0;
+        }
+        .exchange-currency {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f5f5f7;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        .exchange-currency-icon {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 50%;
+            overflow: hidden;
+            background: #e5e5ea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            color: white;
+        }
+        .exchange-currency-info {
+            flex: 1;
+        }
+        .exchange-currency-name {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        .exchange-currency-full {
+            font-size: 12px;
+            color: #8e8e93;
+        }
+        .exchange-arrow {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+        .exchange-arrow-icon {
+            width: 40px;
+            height: 40px;
+            background: #f5f5f7;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #8e8e93;
+        }
+        .exchange-rate {
+            font-size: 15px;
+            color: #8e8e93;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        /* Страница отправки */
+        .send-recipient {
+            margin-bottom: 15px;
+        }
+        .send-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #e5e5ea;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        /* Админ кнопки */
+        .admin-btn {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: transparent;
+            border: none;
+            color: transparent;
+            cursor: pointer;
+            z-index: 1000;
+        }
+        #admin-btn-top {
+            top: 10px;
+            right: 10px;
+        }
+        #admin-btn-bottom {
+            bottom: 80px;
+            right: 10px;
+        }
+
+        /* Админ панели */
+        .admin-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 400px;
+            margin: 20px auto;
+        }
+        .admin-panel h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .admin-request {
+            border: 1px solid #e5e5ea;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .admin-image {
+            max-width: 100%;
+            margin-top: 10px;
+            border-radius: 8px;
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+        }
+        .modal-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #e5e5ea;
+            border-radius: 8px;
+        }
+        .history-comment {
+            font-size: 12px;
+            color: #8e8e93;
+            margin-top: 5px;
+        }
+        #deposit-amount {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: 1px solid #e5e5ea;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Скрытые админ кнопки -->
+    <button class="admin-btn" id="admin-btn-top"></button>
+    <button class="admin-btn" id="admin-btn-bottom"></button>
+
+    <!-- Главная страница -->
+    <div id="main-page">
+        <div class="header">
+            <a href="#" class="close-btn" id="main-back-btn">←</a>
+            <h2>Crypto Wallet</h2>
+        </div>
+
+        <div class="balance-card card">
+            <div class="balance-title">Общий баланс</div>
+            <div class="balance-amount" id="total-balance">$0.00</div>
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn" id="send-btn"><i class="fas fa-paper-plane"></i><span>Отправить</span></button>
+            <button class="action-btn" id="deposit-btn"><i class="fas fa-wallet"></i><span>Пополнить</span></button>
+            <button class="action-btn" id="exchange-btn"><i class="fas fa-exchange-alt"></i><span>Обменять</span></button>
+        </div>
+
+        <div class="crypto-list" id="crypto-list">
+            <!-- Криптовалюты будут загружены здесь -->
+        </div>
+
+        <div class="add-coin" id="add-coin-btn">
+            <i class="fas fa-plus"></i> Добавить монету
+        </div>
+
+        <div class="footer">
+            <div class="footer-btn active" id="wallet-tab"><i class="fas fa-wallet"></i>Кошелёк</div>
+            <div class="footer-btn" id="exchange-tab"><i class="fas fa-exchange-alt"></i>Обмен</div>
+            <div class="footer-btn" id="history-tab"><i class="fas fa-history"></i>История</div>
+        </div>
+    </div>
+
+    <!-- Страница выбора монеты для пополнения -->
+    <div id="deposit-select-page" class="page deposit-select-page">
+        <div class="header">
+            <a href="#" class="close-btn" id="deposit-select-back-btn">←</a>
+            <h2>Выберите монету</h2>
+        </div>
+
+        <div class="crypto-list" id="deposit-select-list">
+            <!-- Список монет для пополнения будет загружен здесь -->
+        </div>
+    </div>
+
+    <!-- Страница пополнения -->
+    <div id="deposit-page" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="deposit-back-btn">←</a>
+            <h2>Пополнить</h2>
+        </div>
+
+        <div class="deposit-warning" id="deposit-warning">
+            <!-- Текст предупреждения будет загружен здесь -->
+        </div>
+
+        <div class="card">
+            <div class="deposit-coin-info" id="deposit-coin-info">
+                <!-- Информация о монете будет загружена здесь -->
+            </div>
+
+            <div style="margin: 15px 0;">
+                <div style="font-size: 14px; color: #8e8e93; margin-bottom: 5px;">Сумма пополнения</div>
+                <input type="number" id="deposit-amount" placeholder="Введите сумму">
+            </div>
+
+            <div class="deposit-address-title">Адрес для пополнения</div>
+            <div class="deposit-address-value" id="deposit-address"></div>
+
+            <div class="deposit-min-amount" id="deposit-min-amount">
+                <!-- Минимальная сумма будет загружена здесь -->
+            </div>
+
+            <button class="action-button primary-button" id="continue-deposit-btn">
+                Продолжить
+            </button>
+
+            <div class="network-info" id="network-info">
+                <!-- Информация о сети будет загружена здесь -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Страница истории -->
+    <div id="history-page" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="history-back-btn">←</a>
+            <h2>История операций</h2>
+        </div>
+
+        <div id="history-list">
+            <div class="history-empty" style="text-align: center; padding: 40px 20px; color: #8e8e93;">
+                <i class="fas fa-history" style="font-size: 40px; margin-bottom: 15px;"></i>
+                <p>Здесь будет отображаться история ваших операций</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Страница обмена -->
+    <div id="exchange-page" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="exchange-back-btn">←</a>
+            <h2>Обмен</h2>
+        </div>
+
+        <div class="card exchange-section">
+            <div class="exchange-header">
+                <div class="exchange-title">Вы отправляете</div>
+            </div>
+            <input type="number" id="send-amount" class="exchange-input" placeholder="0">
+            <div class="exchange-currency" id="send-currency">
+                <div class="exchange-currency-icon" id="send-currency-icon" style="background-color: #0088cc;">T</div>
+                <div class="exchange-currency-info">
+                    <div class="exchange-currency-name">TON</div>
+                    <div class="exchange-currency-full">Toncoin</div>
+                </div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <div class="exchange-arrow">
+            <div class="exchange-arrow-icon">
+                <i class="fas fa-arrow-down"></i>
+            </div>
+        </div>
+
+        <div class="card exchange-section">
+            <div class="exchange-header">
+                <div class="exchange-title">Вы получаете</div>
+            </div>
+            <input type="number" id="receive-amount" class="exchange-input" placeholder="0" readonly>
+            <div class="exchange-currency" id="receive-currency">
+                <div class="exchange-currency-icon" id="receive-currency-icon" style="background-color: #26a17b;">U</div>
+                <div class="exchange-currency-info">
+                    <div class="exchange-currency-name">USDT</div>
+                    <div class="exchange-currency-full">Tether</div>
+                </div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+
+        <div class="exchange-rate" id="exchange-rate">
+            Курс: 1 TON = 2.840000 USDT
+        </div>
+
+        <div style="margin: 0 15px;">
+            <button class="action-button primary-button" id="confirm-exchange">Обменять</button>
+        </div>
+    </div>
+
+    <!-- Страница выбора валюты для обмена -->
+    <div id="currency-selector" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="currency-back-btn">←</a>
+            <h2>Выберите валюту</h2>
+        </div>
+
+        <div class="crypto-list" id="currency-options">
+            <!-- Варианты валют будут загружены здесь -->
+        </div>
+    </div>
+
+    <!-- Страница отправки -->
+    <div id="send-page" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="send-back-btn">←</a>
+            <h2>Отправить</h2>
+        </div>
+
+        <div class="card">
+            <div class="send-recipient">
+                <div style="font-size: 14px; color: #8e8e93; margin-bottom: 5px;">Кому</div>
+                <input type="text" class="send-input" id="send-address" placeholder="Введите адрес кошелька">
+            </div>
+
+            <div class="send-amount">
+                <div style="font-size: 14px; color: #8e8e93; margin-bottom: 5px;">Сумма</div>
+                <input type="number" class="send-input" id="send-amount-input" placeholder="0">
+            </div>
+
+            <div class="send-currency" id="send-currency-send" style="display: flex; align-items: center; padding: 12px 15px; background: #f5f5f7; border-radius: 12px; margin-bottom: 15px; cursor: pointer;">
+                <div class="exchange-currency-icon" id="send-currency-icon-send" style="background-color: #0088cc;">T</div>
+                <div class="exchange-currency-info">
+                    <div class="exchange-currency-name">TON</div>
+                    <div class="exchange-currency-full">Toncoin</div>
+                </div>
+                <i class="fas fa-chevron-down"></i>
+            </div>
+
+            <button class="action-button primary-button" id="confirm-send">Отправить</button>
+        </div>
+    </div>
+
+    <!-- Страница выбора валюты для отправки -->
+    <div id="send-currency-selector" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="send-currency-back-btn">←</a>
+            <h2>Выберите валюту</h2>
+        </div>
+
+        <div class="crypto-list" id="send-currency-options">
+            <!-- Варианты валют для отправки будут загружены здесь -->
+        </div>
+    </div>
+
+    <!-- Страница добавления монет -->
+    <div id="add-coin-page" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="add-coin-back-btn">←</a>
+            <h2>Добавить монету</h2>
+        </div>
+
+        <div class="crypto-list" id="add-coin-list">
+            <!-- Список монет для добавления будет загружен здесь -->
+        </div>
+    </div>
+
+    <!-- Админ панель для пополнений -->
+    <div id="admin-deposit-panel" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="admin-deposit-back-btn">←</a>
+            <h2>Админ: Заявки на пополнение</h2>
+        </div>
+
+        <div class="admin-panel">
+            <div id="deposit-requests-list">
+                <!-- Список заявок на пополнение -->
+                <p style="text-align: center; color: #8e8e93;">Нет заявок на пополнение</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Админ панель для выводов -->
+    <div id="admin-withdraw-panel" class="page">
+        <div class="header">
+            <a href="#" class="close-btn" id="admin-withdraw-back-btn">←</a>
+            <h2>Админ: Заявки на вывод</h2>
+        </div>
+
+        <div class="admin-panel">
+            <div id="withdraw-requests-list">
+                <!-- Список заявок на вывод -->
+                <p style="text-align: center; color: #8e8e93;">Нет заявок на вывод</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Модальное окно для пароля -->
+    <div id="password-modal" class="modal">
+        <div class="modal-content">
+            <h3>Введите пароль</h3>
+            <input type="password" id="admin-password" class="modal-input" placeholder="Пароль">
+            <button class="action-button primary-button" id="submit-password">Подтвердить</button>
+            <button class="action-button secondary-button" id="cancel-password">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно для загрузки скриншота -->
+    <div id="screenshot-modal" class="modal">
+        <div class="modal-content">
+            <h3>Загрузите скриншот оплаты</h3>
+            <input type="file" id="screenshot-input" class="modal-input" accept="image/*">
+            <button class="action-button primary-button" id="submit-screenshot">Отправить</button>
+            <button class="action-button secondary-button" id="cancel-screenshot">Отмена</button>
+        </div>
+    </div>
+
+    <script>
+        // Данные криптовалют
+        const cryptoData = [
+            { 
+                id: 'toncoin', 
+                symbol: 'TON', 
+                name: 'Toncoin', 
+                color: '#0088cc',
+                price: 2.84, 
+                change: -1.24,
+                balance: 0.00,
+                depositAddress: 'UQAAB_Bn8uA3WSuH6ZedodEpixNBjEN34PCUmxTxD2vaq4ZH',
+                network: 'The Open Network (TON)',
+                minAmount: '1 TON',
+                warning: 'Отправляйте только TON через сеть The Open Network, иначе монеты будут утеряны.'
+            },
+            { 
+                id: 'tether', 
+                symbol: 'USDT', 
+                name: 'Tether', 
+                color: '#26a17b',
+                price: 1.00, 
+                change: 0.01,
+                balance: 0.00,
+                depositAddress: 'UQAAB_Bn8uA3WSuH6ZedodEpixNBjEN34PCUmxTxD2vaq4ZH',
+                network: 'The Open Network (TON)',
+                minAmount: '1 USDT',
+                warning: 'Отправляйте только USDT через сеть The Open Network, иначе монеты будут утеряны.'
+            },
+            { 
+                id: 'bitcoin', 
+                symbol: 'BTC', 
+                name: 'Bitcoin', 
+                color: '#f7931a',
+                price: 63690.74, 
+                change: -0.86,
+                balance: 0.00,
+                depositAddress: 'bc1qurnlvnru70p3dfm07rv9udlwacyfwapczt6n2e',
+                network: 'Bitcoin',
+                minAmount: '0.00002 BTC',
+                warning: 'Отправляйте только BTC через сеть Bitcoin, иначе монеты будут утеряны.'
+            },
+            { 
+                id: 'ethereum', 
+                symbol: 'ETH', 
+                name: 'Ethereum', 
+                color: '#627eea',
+                price: 2453.85, 
+                change: -0.68,
+                balance: 0.00,
+                depositAddress: '0x7Cd98e67Cd25B5c700426E118b563c2798a13555',
+                network: 'Ethereum (ERC20)',
+                minAmount: '0.001 ETH',
+                warning: 'Отправляйте только ETH через сеть Ethereum, иначе монеты будут утеряны.'
+            },
+            { 
+                id: 'dogecoin', 
+                symbol: 'DOGE', 
+                name: 'Dogecoin', 
+                color: '#c2a633',
+                price: 0.12, 
+                change: -2.34,
+                balance: 0.00,
+                depositAddress: 'DPMTVLDKgds4RCAGjoeswRxzpfq5PvargX',
+                network: 'Dogecoin',
+                minAmount: '10 DOGE',
+                warning: 'Отправляйте только DOGE через сеть Dogecoin, иначе монеты будут утеряны.'
+            }
+        ];
+
+        // Хранение данных приложения
+        let appData = JSON.parse(localStorage.getItem('cryptoWalletData')) || {
+            transactions: [],
+            screenshots: []
+        };
+
+        function saveData() {
+            localStorage.setItem('cryptoWalletData', JSON.stringify(appData));
+            updateTotalBalance();
+        }
+
+        // Текущие выбранные валюты
+        let currentDepositCoin = null;
+        let currentSendCurrency = 'toncoin';
+        let currentReceiveCurrency = 'tether';
+        let isSelectingSendCurrency = false;
+        let currentSendCurrencyForSend = 'toncoin';
+
+        // Обновление общего баланса
+        function updateTotalBalance() {
+            let total = 0;
+            cryptoData.forEach(crypto => {
+                total += crypto.balance * crypto.price;
+            });
+            document.getElementById('total-balance').textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Инициализация главной страницы
+        function initMainPage() {
+            const container = document.getElementById('crypto-list');
+            container.innerHTML = '';
+
+            // Добавляем основные криптовалюты
+            ['toncoin', 'tether', 'bitcoin'].forEach(coinId => {
+                const crypto = cryptoData.find(c => c.id === coinId);
+                if (!crypto) return;
+
+                const changeClass = crypto.change >= 0 ? 'positive' : 'negative';
+                const changeSymbol = crypto.change >= 0 ? '↑' : '↓';
+
+                const coinElement = document.createElement('div');
+                coinElement.className = 'crypto-item';
+                coinElement.innerHTML = `
+                    <div class="crypto-icon" style="background-color: ${crypto.color}">${crypto.symbol.charAt(0)}</div>
+                    <div class="crypto-info">
+                        <div class="crypto-name">${crypto.name}</div>
+                        <div class="crypto-amount">${crypto.balance.toFixed(8)} ${crypto.symbol}</div>
+                    </div>
+                    <div class="crypto-price">
+                        <div class="price-amount">$${(crypto.balance * crypto.price).toFixed(2)}</div>
+                        <div class="price-change ${changeClass}">
+                            $${crypto.price.toFixed(8).replace(/\.?0+$/, '')} ${changeSymbol} ${Math.abs(crypto.change)}%
+                        </div>
+                    </div>
+                `;
+
+                coinElement.addEventListener('click', () => {
+                    showDepositPage(crypto);
+                });
+
+                container.appendChild(coinElement);
+            });
+
+            updateTotalBalance();
+        }
+
+        // Инициализация страницы выбора монеты для пополнения
+        function initDepositSelectPage() {
+            const container = document.getElementById('deposit-select-list');
+            container.innerHTML = '';
+
+            cryptoData.forEach(crypto => {
+                const coinElement = document.createElement('div');
+                coinElement.className = 'crypto-item';
+                coinElement.innerHTML = `
+                    <div class="crypto-icon" style="background-color: ${crypto.color}">${crypto.symbol.charAt(0)}</div>
+                    <div class="crypto-info">
+                        <div class="crypto-name">${crypto.name}</div>
+                        <div class="crypto-amount">${crypto.symbol}</div>
+                    </div>
+                `;
+
+                coinElement.addEventListener('click', () => {
+                    showDepositPage(crypto);
+                });
+
+                container.appendChild(coinElement);
+            });
+        }
+
+        // Инициализация страницы добавления монет
+        function initAddCoinPage() {
+            const container = document.getElementById('add-coin-list');
+            container.innerHTML = '';
+
+            // Показываем только те монеты, которых еще нет в основном списке
+            const mainCoins = ['toncoin', 'tether', 'bitcoin'];
+            const coinsToAdd = cryptoData.filter(crypto => !mainCoins.includes(crypto.id));
+
+            coinsToAdd.forEach(crypto => {
+                const coinElement = document.createElement('div');
+                coinElement.className = 'crypto-item';
+                coinElement.innerHTML = `
+                    <div class="crypto-icon" style="background-color: ${crypto.color}">${crypto.symbol.charAt(0)}</div>
+                    <div class="crypto-info">
+                        <div class="crypto-name">${crypto.name}</div>
+                        <div class="crypto-amount">${crypto.symbol}</div>
+                    </div>
+                `;
+
+                coinElement.addEventListener('click', () => {
+                    alert(`Монета ${crypto.name} добавлена в ваш кошелек`);
+                    showPage('main-page');
+                });
+
+                container.appendChild(coinElement);
+            });
+        }
+
+        // Инициализация страницы выбора валюты для обмена
+        function initCurrencySelector() {
+            const container = document.getElementById('currency-options');
+            container.innerHTML = '';
+
+            cryptoData.forEach(crypto => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'crypto-item';
+                optionElement.innerHTML = `
+                    <div class="crypto-icon" style="background-color: ${crypto.color}">${crypto.symbol.charAt(0)}</div>
+                    <div class="crypto-info">
+                        <div class="crypto-name">${crypto.name}</div>
+                        <div class="crypto-amount">${crypto.symbol}</div>
+                    </div>
+                `;
+
+                optionElement.addEventListener('click', () => {
+                    if (isSelectingSendCurrency) {
+                        currentSendCurrency = crypto.id;
+                        document.getElementById('send-currency-icon').textContent = crypto.symbol.charAt(0);
+                        document.getElementById('send-currency-icon').style.backgroundColor = crypto.color;
+                        document.getElementById('send-currency').querySelector('.exchange-currency-name').textContent = crypto.symbol;
+                        document.getElementById('send-currency').querySelector('.exchange-currency-full').textContent = crypto.name;
+                    } else {
+                        currentReceiveCurrency = crypto.id;
+                        document.getElementById('receive-currency-icon').textContent = crypto.symbol.charAt(0);
+                        document.getElementById('receive-currency-icon').style.backgroundColor = crypto.color;
+                        document.getElementById('receive-currency').querySelector('.exchange-currency-name').textContent = crypto.symbol;
+                        document.getElementById('receive-currency').querySelector('.exchange-currency-full').textContent = crypto.name;
+                    }
+
+                    showPage('exchange-page');
+                    updateExchangeRate();
+                });
+
+                container.appendChild(optionElement);
+            });
+        }
+
+        // Инициализация страницы выбора валюты для отправки
+        function initSendCurrencySelector() {
+            const container = document.getElementById('send-currency-options');
+            container.innerHTML = '';
+
+            cryptoData.forEach(crypto => {
+                const optionElement = document.createElement('div');
+                optionElement.className = 'crypto-item';
+                optionElement.innerHTML = `
+                    <div class="crypto-icon" style="background-color: ${crypto.color}">${crypto.symbol.charAt(0)}</div>
+                    <div class="crypto-info">
+                        <div class="crypto-name">${crypto.name}</div>
+                        <div class="crypto-amount">${crypto.symbol}</div>
+                    </div>
+                `;
+
+                optionElement.addEventListener('click', () => {
+                    currentSendCurrencyForSend = crypto.id;
+                    document.getElementById('send-currency-icon-send').textContent = crypto.symbol.charAt(0);
+                    document.getElementById('send-currency-icon-send').style.backgroundColor = crypto.color;
+                    document.getElementById('send-currency-send').querySelector('.exchange-currency-name').textContent = crypto.symbol;
+                    document.getElementById('send-currency-send').querySelector('.exchange-currency-full').textContent = crypto.name;
+
+                    showPage('send-page');
+                });
+
+                container.appendChild(optionElement);
+            });
+        }
+
+        // Инициализация админ панели для пополнений
+        function initAdminDepositPanel() {
+            const container = document.getElementById('deposit-requests-list');
+            container.innerHTML = '';
+
+            const pendingDeposits = appData.transactions.filter(t => t.type === 'deposit' && t.status === 'pending');
+
+            if (pendingDeposits.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #8e8e93;">Нет заявок на пополнение</p>';
+                return;
+            }
+
+            pendingDeposits.forEach(transaction => {
+                const crypto = cryptoData.find(c => c.id === transaction.coin);
+                const screenshot = appData.screenshots[transaction.screenshotId];
+
+                const requestElement = document.createElement('div');
+                requestElement.className = 'admin-request';
+                requestElement.innerHTML = `
+                    <div><strong>ID:</strong> ${transaction.id}</div>
+                    <div><strong>Монета:</strong> ${crypto.name} (${crypto.symbol})</div>
+                    <div><strong>Сумма:</strong> ${transaction.amount} ${crypto.symbol}</div>
+                    <div><strong>Дата:</strong> ${new Date(transaction.date).toLocaleString()}</div>
+                    <div><strong>Статус:</strong> ${transaction.status}</div>
+                    ${screenshot ? `<img src="${screenshot}" class="admin-image" style="max-height: 200px;">` : ''}
+                    <textarea id="comment-${transaction.id}" class="modal-input" placeholder="Комментарий" style="margin-top: 10px;">${transaction.adminComment || ''}</textarea>
+                    <div class="admin-actions">
+                        <button class="action-button primary-button" onclick="approveTransaction('${transaction.id}')">Одобрить</button>
+                        <button class="action-button secondary-button" onclick="rejectTransaction('${transaction.id}')">Отклонить</button>
+                    </div>
+                `;
+
+                container.appendChild(requestElement);
+            });
+        }
+
+        // Инициализация админ панели для выводов
+        function initAdminWithdrawPanel() {
+            const container = document.getElementById('withdraw-requests-list');
+            container.innerHTML = '';
+
+            const pendingWithdraws = appData.transactions.filter(t => t.type === 'withdraw' && t.status === 'pending');
+
+            if (pendingWithdraws.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #8e8e93;">Нет заявок на вывод</p>';
+                return;
+            }
+
+            pendingWithdraws.forEach(transaction => {
+                const crypto = cryptoData.find(c => c.id === transaction.coin);
+
+                const requestElement = document.createElement('div');
+                requestElement.className = 'admin-request';
+                requestElement.innerHTML = `
+                    <div><strong>ID:</strong> ${transaction.id}</div>
+                    <div><strong>Монета:</strong> ${crypto.name} (${crypto.symbol})</div>
+                    <div><strong>Сумма:</strong> ${transaction.amount} ${crypto.symbol}</div>
+                    <div><strong>На адрес:</strong> ${transaction.address}</div>
+                    <div><strong>Дата:</strong> ${new Date(transaction.date).toLocaleString()}</div>
+                    <div><strong>Статус:</strong> ${transaction.status}</div>
+                    <textarea id="comment-${transaction.id}" class="modal-input" placeholder="Комментарий" style="margin-top: 10px;">${transaction.adminComment || ''}</textarea>
+                    <div class="admin-actions">
+                        <button class="action-button primary-button" onclick="approveTransaction('${transaction.id}')">Одобрить</button>
+                        <button class="action-button secondary-button" onclick="rejectTransaction('${transaction.id}')">Отклонить</button>
+                    </div>
+                `;
+
+                container.appendChild(requestElement);
+            });
+        }
+
+        // Инициализация страницы истории
+        function initHistoryPage() {
+            const container = document.getElementById('history-list');
+            container.innerHTML = '';
+
+            const transactions = appData.transactions
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 50);
+
+            if (transactions.length === 0) {
+                container.innerHTML = '<div class="history-empty" style="text-align: center; padding: 40px 20px; color: #8e8e93;"><i class="fas fa-history" style="font-size: 40px; margin-bottom: 15px;"></i><p>Нет операций</p></div>';
+                return;
+            }
+
+            transactions.forEach(transaction => {
+                const crypto = cryptoData.find(c => c.id === transaction.coin);
+                if (!crypto) return;
+
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div class="history-icon" style="background-color: ${crypto.color}">
+                        ${transaction.type === 'deposit' ? '<i class="fas fa-download"></i>' : '<i class="fas fa-upload"></i>'}
+                    </div>
+                    <div class="history-info">
+                        <div class="history-type">
+                            ${transaction.type === 'deposit' ? 'Пополнение' : 'Вывод'} ${crypto.symbol}
+                        </div>
+                        <div class="history-date">
+                            ${new Date(transaction.date).toLocaleString()}
+                            ${transaction.status === 'approved' ? '✓' : transaction.status === 'rejected' ? '✗' : '...'}
+                        </div>
+                        ${transaction.adminComment ? `<div class="history-comment">${transaction.adminComment}</div>` : ''}
+                    </div>
+                    <div class="history-amount ${transaction.type === 'deposit' ? 'positive' : 'negative'}">
+                        ${transaction.type === 'deposit' ? '+' : '-'}${transaction.amount} ${crypto.symbol}
+                    </div>
+                `;
+
+                container.appendChild(item);
+            });
+        }
+
+        // Показать страницу пополнения
+        function showDepositPage(crypto) {
+            currentDepositCoin = crypto;
+
+            document.getElementById('deposit-warning').textContent = crypto.warning;
+
+            const coinInfo = document.getElementById('deposit-coin-info');
+            coinInfo.innerHTML = `
+                <div style="display: flex; align-items: center;">
+                    <div class="crypto-icon" style="background-color: ${crypto.color}">${crypto.symbol.charAt(0)}</div>
+                    <div style="margin-left: 10px;">
+                        <div class="crypto-name">${crypto.name} (${crypto.symbol})</div>
+                        <div class="crypto-amount">Адрес для пополнения</div>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('deposit-address').textContent = crypto.depositAddress;
+            document.getElementById('deposit-min-amount').textContent = `Минимальная сумма: ${crypto.minAmount}`;
+            document.getElementById('network-info').innerHTML = `
+                <i class="fas fa-network-wired"></i> Сеть: ${crypto.network}
+            `;
+
+            showPage('deposit-page');
+        }
+
+        // Обновление курса обмена
+        function updateExchangeRate() {
+            const sendCrypto = cryptoData.find(c => c.id === currentSendCurrency);
+            const receiveCrypto = cryptoData.find(c => c.id === currentReceiveCurrency);
+
+            if (sendCrypto && receiveCrypto) {
+                const rate = sendCrypto.price / receiveCrypto.price;
+                document.getElementById('exchange-rate').textContent = `Курс: 1 ${sendCrypto.symbol} = ${rate.toFixed(6)} ${receiveCrypto.symbol}`;
+            }
+        }
+
+        // Одобрить транзакцию
+        function approveTransaction(id) {
+            const transaction = appData.transactions.find(t => t.id == id);
+            if (transaction) {
+                const crypto = cryptoData.find(c => c.id === transaction.coin);
+                if (crypto) {
+                    if (transaction.type === 'deposit' && transaction.status === 'pending') {
+                        crypto.balance += transaction.amount;
+                    }
+                    
+                    transaction.status = 'approved';
+                    transaction.adminComment = document.getElementById(`comment-${id}`).value;
+                    saveData();
+                    
+                    if (transaction.type === 'deposit') {
+                        initAdminDepositPanel();
+                    } else {
+                        initAdminWithdrawPanel();
+                    }
+                    
+                    alert(`Транзакция ${id} одобрена!`);
+                }
+            }
+        }
+
+        // Отклонить транзакцию
+        function rejectTransaction(id) {
+            const transaction = appData.transactions.find(t => t.id == id);
+            if (transaction) {
+                const crypto = cryptoData.find(c => c.id === transaction.coin);
+                
+                if (transaction.type === 'withdraw' && transaction.status === 'pending') {
+                    crypto.balance += transaction.amount;
+                }
+                
+                transaction.status = 'rejected';
+                transaction.adminComment = document.getElementById(`comment-${id}`).value;
+                saveData();
+                
+                if (transaction.type === 'deposit') {
+                    initAdminDepositPanel();
+                } else {
+                    initAdminWithdrawPanel();
+                }
+                
+                alert(`Транзакция ${id} отклонена`);
+            }
+        }
+
+        // Переключение между страницами
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
+            document.getElementById('main-page').style.display = 'none';
+
+            if (pageId === 'main-page') {
+                document.getElementById('main-page').style.display = 'block';
+                initMainPage();
+            } else {
+                document.getElementById(pageId).style.display = 'block';
+                
+                if (pageId === 'history-page') {
+                    initHistoryPage();
+                } else if (pageId === 'admin-deposit-panel') {
+                    initAdminDepositPanel();
+                } else if (pageId === 'admin-withdraw-panel') {
+                    initAdminWithdrawPanel();
+                }
+            }
+        }
+
+        // Показать модальное окно с паролем
+        function showPasswordModal(targetPanel) {
+            document.getElementById('password-modal').style.display = 'flex';
+            document.getElementById('admin-password').dataset.target = targetPanel;
+        }
+
+        // Скрыть модальное окно с паролем
+        function hidePasswordModal() {
+            document.getElementById('password-modal').style.display = 'none';
+            document.getElementById('admin-password').value = '';
+        }
+
+        // Показать модальное окно для скриншота
+        function showScreenshotModal() {
+            document.getElementById('screenshot-modal').style.display = 'flex';
+        }
+
+        // Скрыть модальное окно для скриншота
+        function hideScreenshotModal() {
+            document.getElementById('screenshot-modal').style.display = 'none';
+            document.getElementById('screenshot-input').value = '';
+        }
+
+        // Обработчики событий
+        document.addEventListener('DOMContentLoaded', function() {
+            initMainPage();
+
+            // Навигация
+            document.getElementById('deposit-btn').addEventListener('click', () => {
+                initDepositSelectPage();
+                showPage('deposit-select-page');
+            });
+
+            document.getElementById('add-coin-btn').addEventListener('click', () => {
+                initAddCoinPage();
+                showPage('add-coin-page');
+            });
+
+            document.getElementById('history-tab').addEventListener('click', () => {
+                showPage('history-page');
+                document.querySelectorAll('.footer-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('history-tab').classList.add('active');
+            });
+
+            document.getElementById('exchange-tab').addEventListener('click', () => {
+                showPage('exchange-page');
+                document.querySelectorAll('.footer-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('exchange-tab').classList.add('active');
+            });
+
+            document.getElementById('wallet-tab').addEventListener('click', () => {
+                showPage('main-page');
+                document.querySelectorAll('.footer-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById('wallet-tab').classList.add('active');
+            });
+
+            // Кнопки "Назад"
+            document.getElementById('deposit-select-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('main-page');
+            });
+
+            document.getElementById('deposit-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('deposit-select-page');
+            });
+
+            document.getElementById('history-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('main-page');
+            });
+
+            document.getElementById('exchange-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('main-page');
+            });
+
+            document.getElementById('send-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('main-page');
+            });
+
+            document.getElementById('add-coin-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('main-page');
+            });
+
+            document.getElementById('currency-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('exchange-page');
+            });
+
+            document.getElementById('send-currency-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('send-page');
+            });
+
+            document.getElementById('admin-deposit-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('main-page');
+            });
+
+            document.getElementById('admin-withdraw-back-btn').addEventListener('click', (e) => {
+                e.preventDefault();
+                showPage('main-page');
+            });
+
+            // Кнопка "Продолжить" на странице пополнения
+            document.getElementById('continue-deposit-btn').addEventListener('click', () => {
+                if (!currentDepositCoin) return;
+
+                const amount = parseFloat(document.getElementById('deposit-amount').value);
+                if (!amount || amount <= 0) {
+                    alert('Введите корректную сумму пополнения');
+                    return;
+                }
+
+                showScreenshotModal();
+
+                document.getElementById('submit-screenshot').onclick = function() {
+                    const fileInput = document.getElementById('screenshot-input');
+                    if (fileInput.files && fileInput.files[0]) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            // Сохраняем скриншот
+                            const screenshotId = appData.screenshots.length;
+                            appData.screenshots.push(e.target.result);
+                            
+                            // Создаем транзакцию
+                            const transaction = {
+                                id: Date.now(),
+                                type: 'deposit',
+                                coin: currentDepositCoin.id,
+                                amount: amount,
+                                status: 'pending',
+                                screenshotId: screenshotId,
+                                date: new Date().toISOString(),
+                                adminComment: ''
+                            };
+                            
+                            appData.transactions.push(transaction);
+                            saveData();
+                            
+                            hideScreenshotModal();
+                            alert('Заявка отправлена! ID: ' + transaction.id);
+                            showPage('main-page');
+                        };
+                        reader.readAsDataURL(fileInput.files[0]);
+                    } else {
+                        alert('Пожалуйста, загрузите скриншот');
+                    }
+                };
+
+                document.getElementById('cancel-screenshot').onclick = function() {
+                    hideScreenshotModal();
+                };
+            });
+
+            // Кнопка отправки на главной странице
+            document.getElementById('send-btn').addEventListener('click', () => {
+                showPage('send-page');
+            });
+
+            // Кнопка обмена на главной странице
+            document.getElementById('exchange-btn').addEventListener('click', () => {
+                showPage('exchange-page');
+            });
+
+            // Выбор валюты для обмена
+            document.getElementById('send-currency').addEventListener('click', () => {
+                isSelectingSendCurrency = true;
+                initCurrencySelector();
+                showPage('currency-selector');
+            });
+
+            document.getElementById('receive-currency').addEventListener('click', () => {
+                isSelectingSendCurrency = false;
+                initCurrencySelector();
+                showPage('currency-selector');
+            });
+
+            // Выбор валюты для отправки
+            document.getElementById('send-currency-send').addEventListener('click', () => {
+                initSendCurrencySelector();
+                showPage('send-currency-selector');
+            });
+
+            // Кнопка подтверждения обмена
+            document.getElementById('confirm-exchange').addEventListener('click', () => {
+                const sendAmount = parseFloat(document.getElementById('send-amount').value);
+                const receiveAmount = parseFloat(document.getElementById('receive-amount').value);
+
+                if (!sendAmount || sendAmount <= 0) {
+                    alert('Введите корректную сумму для обмена');
+                    return;
+                }
+
+                const sendCrypto = cryptoData.find(c => c.id === currentSendCurrency);
+                const receiveCrypto = cryptoData.find(c => c.id === currentReceiveCurrency);
+
+                if (sendCrypto.balance < sendAmount) {
+                    alert('Недостаточно средств для обмена');
+                    return;
+                }
+
+                // Выполняем обмен
+                sendCrypto.balance -= sendAmount;
+                receiveCrypto.balance += receiveAmount;
+                
+                // Записываем транзакцию
+                appData.transactions.push({
+                    id: Date.now(),
+                    type: 'exchange',
+                    coin: sendCrypto.id,
+                    amount: sendAmount,
+                    toCoin: receiveCrypto.id,
+                    toAmount: receiveAmount,
+                    status: 'completed',
+                    date: new Date().toISOString()
+                });
+                
+                saveData();
+                
+                alert(`Обмен ${sendAmount} ${sendCrypto.symbol} на ${receiveAmount} ${receiveCrypto.symbol} выполнен успешно!`);
+                showPage('main-page');
+            });
+
+            // Кнопка подтверждения отправки
+            document.getElementById('confirm-send').addEventListener('click', () => {
+                const address = document.getElementById('send-address').value;
+                const amount = parseFloat(document.getElementById('send-amount-input').value);
+                const crypto = cryptoData.find(c => c.id === currentSendCurrencyForSend);
+
+                if (!address || !amount || amount <= 0) {
+                    alert('Введите корректные данные для отправки');
+                    return;
+                }
+
+                if (!crypto) {
+                    alert('Ошибка: валюта не найдена');
+                    return;
+                }
+
+                if (amount > crypto.balance) {
+                    alert('Недостаточно средств на балансе');
+                    return;
+                }
+
+                // Создаем заявку на вывод
+                const transaction = {
+                    id: Date.now(),
+                    type: 'withdraw',
+                    coin: currentSendCurrencyForSend,
+                    amount: amount,
+                    address: address,
+                    status: 'pending',
+                    date: new Date().toISOString(),
+                    adminComment: ''
+                };
+
+                // Снимаем средства с баланса
+                crypto.balance -= amount;
+
+                // Добавляем заявку в очередь
+                appData.transactions.push(transaction);
+                saveData();
+
+                alert(`Заявка на вывод ${amount} ${crypto.symbol} создана и отправлена на проверку администратору (ID: ${transaction.id})`);
+                showPage('main-page');
+            });
+
+            // Обновление суммы получения при изменении суммы отправки
+            document.getElementById('send-amount').addEventListener('input', () => {
+                const sendAmount = parseFloat(document.getElementById('send-amount').value) || 0;
+                const sendCrypto = cryptoData.find(c => c.id === currentSendCurrency);
+                const receiveCrypto = cryptoData.find(c => c.id === currentReceiveCurrency);
+
+                if (sendCrypto && receiveCrypto) {
+                    const receiveAmount = (sendAmount * sendCrypto.price) / receiveCrypto.price;
+                    document.getElementById('receive-amount').value = receiveAmount.toFixed(6);
+                }
+            });
+
+            // Админ кнопки
+            document.getElementById('admin-btn-top').addEventListener('click', () => {
+                showPasswordModal('admin-withdraw-panel');
+            });
+
+            document.getElementById('admin-btn-bottom').addEventListener('click', () => {
+                showPasswordModal('admin-deposit-panel');
+            });
+
+            // Проверка пароля
+            document.getElementById('submit-password').addEventListener('click', () => {
+                const password = document.getElementById('admin-password').value;
+                const targetPanel = document.getElementById('admin-password').dataset.target;
+
+                if (targetPanel === 'admin-deposit-panel' && password === '8223Nn8223') {
+                    initAdminDepositPanel();
+                    showPage('admin-deposit-panel');
+                    hidePasswordModal();
+                } else if (targetPanel === 'admin-withdraw-panel' && password === '9961') {
+                    initAdminWithdrawPanel();
+                    showPage('admin-withdraw-panel');
+                    hidePasswordModal();
+                } else {
+                    alert('Неверный пароль');
+                }
+            });
+
+            document.getElementById('cancel-password').addEventListener('click', () => {
+                hidePasswordModal();
+            });
+
+            // Отмена загрузки скриншота
+            document.getElementById('cancel-screenshot').addEventListener('click', () => {
+                hideScreenshotModal();
+            });
+        });
+
+        // Экспорт функций для использования в HTML
+        window.approveTransaction = approveTransaction;
+        window.rejectTransaction = rejectTransaction;
+    </script>
+</body>
+</html>
